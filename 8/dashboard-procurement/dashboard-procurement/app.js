@@ -1,7 +1,7 @@
 /* 
 =========================
    FOREST • OPS — app.js
-   גרסה: 3.4.0 (RTL – unified filters + progress rail)
+   גרסה: 3.4.0 (RTL – unified filters + progress rail + charts)
 ========================= */
 /* ---------- Config ---------- */
 const LS_KEY   = 'forest_ops_projects_v1';
@@ -68,9 +68,37 @@ function fmtCurrency(v){
       division:'חטיבה 1', unit:'יחידה 3', supervisor:'—',
       activity:'הארכה/הגדלה', kind:'פרויקט חדש',
       subject:'בדיקה הנדסית למערכות', projStatus:'בתהליך',
-      estimatePeriodic:'', planStart:'2025-01-10', planEnd:'2025-03-30',
+      estimatePeriodic:'50000', planStart:'2025-01-10', planEnd:'2025-03-30',
       actualStart:'', actualEnd:'', task:'איסוף דרישות', taskOwner:'עדן', taskDue:'2025-03-15',
-      taskStatus:'בתהליך', notes:'', currentOrderNo:'', currentSuppliers:'',
+      taskStatus:'בתהליך', notes:'', currentOrderNo:'', currentSuppliers:'', 
+      currentPeriodic:'', currentAnnual:'', currentEnd:'', totalYearsCurrent:'',
+      newOrderNo:'', agreementYears:'', optionYears:'', totalYears:'',
+      annualEstimate:'', winnersNames:'',
+      createdAt: nowIso(), updatedAt: nowIso()
+    },
+    {
+      id: uuid(),
+      year: '2025', area:'שטח רכש טכני', dept:'מחלקה 2', domain:'תחום ב', buyer:'דני',
+      division:'חטיבה 2', unit:'יחידה 1', supervisor:'—',
+      activity:'מכרז', kind:'פרויקט חדש',
+      subject:'רכישת ציוד מחשבים', projStatus:'הסתיים',
+      estimatePeriodic:'100000', planStart:'2025-01-01', planEnd:'2025-02-28',
+      actualStart:'2025-01-01', actualEnd:'2025-02-15', task:'התקנה', taskOwner:'שרה', taskDue:'2025-02-20',
+      taskStatus:'הסתיים', notes:'', currentOrderNo:'', currentSuppliers:'', 
+      currentPeriodic:'', currentAnnual:'', currentEnd:'', totalYearsCurrent:'',
+      newOrderNo:'', agreementYears:'', optionYears:'', totalYears:'',
+      annualEstimate:'', winnersNames:'',
+      createdAt: nowIso(), updatedAt: nowIso()
+    },
+    {
+      id: uuid(),
+      year: '2024', area:'שטח רכש מנהלי', dept:'מחלקה 1', domain:'תחום א', buyer:'מוריה',
+      division:'חטיבה 1', unit:'יחידה 2', supervisor:'—',
+      activity:'ספק יחיד', kind:'פרויקט חדש',
+      subject:'שירותי ייעוץ', projStatus:'לא התחיל',
+      estimatePeriodic:'25000', planStart:'2025-03-01', planEnd:'2025-06-30',
+      actualStart:'', actualEnd:'', task:'תכנון', taskOwner:'יוסי', taskDue:'2025-03-15',
+      taskStatus:'לא התחיל', notes:'', currentOrderNo:'', currentSuppliers:'', 
       currentPeriodic:'', currentAnnual:'', currentEnd:'', totalYearsCurrent:'',
       newOrderNo:'', agreementYears:'', optionYears:'', totalYears:'',
       annualEstimate:'', winnersNames:'',
@@ -201,7 +229,7 @@ function renderProgressPanel(list){
         </div>
       </div>
       <div class="bars" id="activity-bars">
-        ${rows.map((r,i)=>`
+        ${rows.map((r,i)=>
           <div class="bar-row">
             <div class="bar-head">
               <span class="bar-name">${r.name}</span>
@@ -222,7 +250,13 @@ function renderProgressPanel(list){
     fg.style.strokeDashoffset = String(offset);
 
     // פסים
-    host.querySelectorAll('.bar-fill').forEach(e  });
+    host.querySelectorAll('.bar-fill').forEach(el=>{
+      const pct = Number(el.getAttribute('data-target')) || 0;
+      const color = el.getAttribute('data-color') || '#b8ff7a';
+      el.style.setProperty('--bar-color', color);
+      el.style.width = pct + '%';
+    });
+  });
 }
 
 /* =======================================================
@@ -443,14 +477,6 @@ function renderMonthlyCompletionsChart(projects) {
         }
       }
     }
-  });
-}
-
-/* =======================================================
-   דף 1: טבלת פרויקטים
-   ======================================================= */tProperty('--bar-color', color);
-      el.style.width = pct + '%';
-    });
   });
 }
 
@@ -907,10 +933,9 @@ function initDashboard(){
   }
 
   function applyFilters(){
-    const list = orig.filter(p=>{    renderKpis(list);
-    renderProgressPanel(list); // <<< חדש: עדכון הכרטיס
-    renderCharts(list); // <<< חדש: עדכון הגרפים
-  }      if(filters.area?.value     && p.area!==filters.area.value) return false;
+    const list = orig.filter(p=>{
+      if(filters.year?.value     && p.year!==filters.year.value) return false;
+      if(filters.area?.value     && p.area!==filters.area.value) return false;
       if(filters.dept?.value     && p.dept!==filters.dept.value) return false;
       if(filters.unit?.value     && p.unit!==filters.unit.value) return false;
       if(filters.buyer?.value    && p.buyer!==filters.buyer.value) return false;
@@ -921,6 +946,7 @@ function initDashboard(){
     });
     renderKpis(list);
     renderProgressPanel(list); // <<< חדש: עדכון הכרטיס
+    renderCharts(list); // <<< חדש: עדכון הגרפים
   }
 
   Object.values(filters).forEach(sel=> sel && sel.addEventListener('change', applyFilters));
