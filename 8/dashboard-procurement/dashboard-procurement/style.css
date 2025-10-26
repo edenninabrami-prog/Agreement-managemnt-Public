@@ -256,15 +256,61 @@ thead th:last-child,tbody td:last-child{position:sticky;left:0;z-index:3;backgro
   --bar-color:#b8ff7a;
   position:absolute; top:0; right:0; height:100%; width:0%;
   background:var(--bar-color); transition:width .45s ease;
+}/* מסגרת לבנה ודגש כמו במוקאפ (אם כבר הייתה – זה מבטיח) */
+.progress-card{
+  border:1px solid #ffffff;            /* מסגרת לבנה */
+  box-shadow:0 8px 24px rgba(0,0,0,.08), 0 0 0 1px rgba(255,255,255,.6) inset; /* הילה עדינה */
+  max-width:340px;
 }
-/* === Progress card under KPI (no sticky) === */
-.progress-under-kpi{
-  display:flex;
-  justify-content:flex-end;   /* בדסקטופ מימין */
-  margin-top: 8px;
+
+/* === Charts Section === */
+.charts-grid{
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  direction: rtl;
 }
-@media (max-width:979px){
-  .progress-under-kpi{ justify-content:center; }  /* במובייל למרכז */
+
+.chart-container{
+  background: #ffffff;
+  border: 1px solid rgba(17,24,39,.06);
+  border-radius: 0;
+  padding: 20px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.05);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.chart-container:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
+
+.chart-container h3{
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: center;
+}
+
+.chart-container canvas{
+  max-width: 100%;
+  height: auto;
+}
+
+.chart-wide{
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px){
+  .charts-grid{
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-container{
+    padding: 16px;
+  }
+}מובייל למרכז */
 }
 
 /* מסגרת לבנה ודגש כמו במוקאפ (אם כבר הייתה – זה מבטיח) */
