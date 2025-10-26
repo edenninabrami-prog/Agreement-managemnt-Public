@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>פרויקטים — ניהול פרויקטי רכש</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">FOREST • OPS</div>
+      <nav class="side-icons">
+        <a href="projects.html" class="icon-btn active" title="רשימת פרויקטים">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+        </a>
+        <a href="dashboard.html" class="icon-btn" title="דשבורד מנהלים">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+        </a>
+        <a href="metrics.html" class="icon-btn" title="ניהול מדדים">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 19h16v2H4v-2zM7 10h2v7H7v-7zm4-3h2v10h-2V7zm4 5h2v5h-2v-5z"/></svg>
+        </a>
+        <a href="new-project.html" class="icon-btn plus" title="פתיחת פרויקט חדש">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+        </a>
+      </nav>
+      <div class="side-note">v2.0</div>
+    </aside>
+    <main class="page" id="projects-page">
+      <!-- מסננים -->
+      <section class="panel panel-tight">
+        <h1>ניהול תצורה</h1>
+        <div class="filters filters-compact">
+          <label>שטח רכש
+            <select id="f-area"><option value="">הכול</option></select>
+          </label>
+          <label>שנה
+            <select id="f-year"><option value="">הכול</option></select>
+          </label>
+          <label>מחלקה
+            <select id="f-dept"><option value="">הכול</option></select>
+          </label>
+          <label>יחידה מזמינה
+            <select id="f-unit"><option value="">הכול</option></select>
+          </label>
+          <label>אחראי ברכש
+            <select id="f-buyer"><option value="">הכול</option></select>
+          </label>
+          <label>סיווג הפעילות
+            <select id="f-activity"><option value="">הכול</option></select>
+          </label>
+          <label>סטטוס פרויקט
+            <select id="f-status"><option value="">הכול</option></select>
+          </label>
+          <label>סטטוס משימה
+            <select id="f-task"><option value="">הכול</option></select>
+          </label>
+          <div class="filters-actions">
+            <button id="btn-clear-filters" class="ghost sm">איפוס</button>
+          </div>
+        </div>
+      </section>
+      <!-- KPI -->
+      <section class="panel">
+        <h1>תמונת מצב עדכנית</h1>
+        <div class="kpi-grid">
+          <div class="kpi kpi--total">
+            <div id="kpi-total" class="kpi-value">0</div>
+            <div class="kpi-label">סה״כ פרויקטים</div>
+          </div>
+          <div class="kpi kpi--done">
+            <div id="kpi-done" class="kpi-value">0</div>
+            <div class="kpi-label">הסתיימו</div>
+          </div>
+          <div class="kpi kpi--in">
+            <div id="kpi-in" class="kpi-value">0</div>
+            <div class="kpi-label">בתהליך</div>
+          </div>
+          <div class="kpi kpi--not">
+            <div id="kpi-not" class="kpi-value">0</div>
+            <div class="kpi-label">לא התחיל</div>
+          </div>
+          <div class="kpi kpi--cancel">
+            <div id="kpi-cancel" class="kpi-value">0</div>
+            <div class="kpi-label">מבוטל</div>
+          </div>
+          <div class="kpi kpi--freeze">
+            <div id="kpi-freeze" class="kpi-value">0</div>
+            <div class="kpi-label">מוקפא</div>
+          </div>
+        </div>
+      </section>
+      <!-- טבלה -->
+      <section class="panel">
+        <h1>תצוגת פרויקטים מפורטת</h1>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="min-width:88px">פעולות</th>
+                <th>שנה</th>
+                <th>שטח רכש</th>
+                <th>מחלקה</th><th>תחום</th><th>אחראי ברכש</th>
+                <th>חטיבה</th><th>יחידה מזמינה</th><th>מפקח עבודה</th>
+                <th>סוג פרויקט</th>
+                <th>נושא</th><th>סיווג פעילות</th><th>סטטוס</th>
+                <th>אומדן תקופתי (₪)</th>
+                <th>התחלה מתוכננת</th><th>סיום מתוכננת</th>
+                <th>התחלה בפועל</th><th>סיום בפועל</th>
+                <th>משימה</th><th>אחראי משימה</th><th>לוז משימה</th><th>סטטוס משימה</th><th>הערות</th>
+                <th>מס׳ הזמנה נוכחי</th><th>ספק/ים נוכחיים</th>
+                <th>היקף נוכחי תקופתי (₪)</th><th>היקף נוכחי שנתי (₪)</th><th>סיום התקשרות נוכחית</th>
+                <th>מס׳ הזמנה חדשה</th>
+                <th>הצעה זוכה תקופתי (₪)</th><th>הצעה זוכה שנתי (₪)</th>
+                <th>שנים להזמנה</th><th>שנים לאופציה</th><th>סה״כ שנים להתקשרות</th>
+              </tr>
+            </thead>
+            <tbody id="projects-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+  <script>initProjectsPage();</script>
+</body>
+</html>
