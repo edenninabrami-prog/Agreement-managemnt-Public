@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <title>דשבורד — FOREST • OPS</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>css" />
   <style>
     /* שמירה על מראה הכרטיסים בעמוד הדשבורד (תאם למה שהיה) */
     .kpi { border-radius:0; box-shadow:0 6px 16px rgba(0,0,0,.05); }
@@ -91,14 +91,33 @@
           <div class="kpi kpi--in"><div id="kpi-in" class="kpi-value">0</div><div class="kpi-label">בתהליך</div></div>
           <div class="kpi kpi--not"><div id="kpi-not" class="kpi-value">0</div><div class="kpi-label">לא התחיל</div></div>
           <div class="kpi kpi--cancel"><div id="kpi-cancel" class="kpi-value">0</div><div class="kpi-label">מבוטל</div></div>
-          <div class="kpi kpi--freeze"><div id="kpi-freeze" class="kpi-value">0</div><div class="kpi-label">מוקפא</div></div>
-        </div>
-      </section>
-
-      <!-- כרטיס ההתקדמות מתחת ל-KPI -->
+          <div class="kpi kpi--freeze"><div id="kpi-freeze" class="k      <!-- כרטיס ההתקדמות מתחת ל-KPI -->
       <section class="progress-under-kpi">
         <div class="progress-wrapper">
           <div id="progress-card" class="progress-card" aria-label="מד התקדמות"></div>
+        </div>
+      </section>
+
+      <!-- גרפים חדשים -->
+      <section class="panel">
+        <h1>ניתוח נתונים</h1>
+        <div class="charts-grid">
+          <div class="chart-container">
+            <h3>היקף פרויקטים לפי פעילות</h3>
+            <canvas id="chart-volume-by-activity"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>התפלגות פרויקטים לפי סטטוס</h3>
+            <canvas id="chart-projects-by-status"></canvas>
+          </div>
+          <div class="chart-container chart-wide">
+            <h3>השלמות פרויקטים חודשיות</h3>
+            <canvas id="chart-monthly-completions"></canvas>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>progress-card" aria-label="מד התקדמות"></div>
         </div>
       </section>
     </main>

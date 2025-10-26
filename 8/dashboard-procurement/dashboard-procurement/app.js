@@ -1,7 +1,7 @@
 /* 
 =========================
    FOREST • OPS — app.js
-   גרסה: 3.4.0 (RTL – unified filters + progress rail)
+   גרסה: 3.4.0 (RTL – unified filters + progress rail + charts)
 ========================= */
 /* ---------- Config ---------- */
 const LS_KEY   = 'forest_ops_projects_v1';
@@ -68,9 +68,37 @@ function fmtCurrency(v){
       division:'חטיבה 1', unit:'יחידה 3', supervisor:'—',
       activity:'הארכה/הגדלה', kind:'פרויקט חדש',
       subject:'בדיקה הנדסית למערכות', projStatus:'בתהליך',
-      estimatePeriodic:'', planStart:'2025-01-10', planEnd:'2025-03-30',
+      estimatePeriodic:'50000', planStart:'2025-01-10', planEnd:'2025-03-30',
       actualStart:'', actualEnd:'', task:'איסוף דרישות', taskOwner:'עדן', taskDue:'2025-03-15',
-      taskStatus:'בתהליך', notes:'', currentOrderNo:'', currentSuppliers:'',
+      taskStatus:'בתהליך', notes:'', currentOrderNo:'', currentSuppliers:'', 
+      currentPeriodic:'', currentAnnual:'', currentEnd:'', totalYearsCurrent:'',
+      newOrderNo:'', agreementYears:'', optionYears:'', totalYears:'',
+      annualEstimate:'', winnersNames:'',
+      createdAt: nowIso(), updatedAt: nowIso()
+    },
+    {
+      id: uuid(),
+      year: '2025', area:'שטח רכש טכני', dept:'מחלקה 2', domain:'תחום ב', buyer:'דני',
+      division:'חטיבה 2', unit:'יחידה 1', supervisor:'—',
+      activity:'מכרז', kind:'פרויקט חדש',
+      subject:'רכישת ציוד מחשבים', projStatus:'הסתיים',
+      estimatePeriodic:'100000', planStart:'2025-01-01', planEnd:'2025-02-28',
+      actualStart:'2025-01-01', actualEnd:'2025-02-15', task:'התקנה', taskOwner:'שרה', taskDue:'2025-02-20',
+      taskStatus:'הסתיים', notes:'', currentOrderNo:'', currentSuppliers:'', 
+      currentPeriodic:'', currentAnnual:'', currentEnd:'', totalYearsCurrent:'',
+      newOrderNo:'', agreementYears:'', optionYears:'', totalYears:'',
+      annualEstimate:'', winnersNames:'',
+      createdAt: nowIso(), updatedAt: nowIso()
+    },
+    {
+      id: uuid(),
+      year: '2024', area:'שטח רכש מנהלי', dept:'מחלקה 1', domain:'תחום א', buyer:'מוריה',
+      division:'חטיבה 1', unit:'יחידה 2', supervisor:'—',
+      activity:'ספק יחיד', kind:'פרויקט חדש',
+      subject:'שירותי ייעוץ', projStatus:'לא התחיל',
+      estimatePeriodic:'25000', planStart:'2025-03-01', planEnd:'2025-06-30',
+      actualStart:'', actualEnd:'', task:'תכנון', taskOwner:'יוסי', taskDue:'2025-03-15',
+      taskStatus:'לא התחיל', notes:'', currentOrderNo:'', currentSuppliers:'', 
       currentPeriodic:'', currentAnnual:'', currentEnd:'', totalYearsCurrent:'',
       newOrderNo:'', agreementYears:'', optionYears:'', totalYears:'',
       annualEstimate:'', winnersNames:'',
@@ -201,7 +229,7 @@ function renderProgressPanel(list){
         </div>
       </div>
       <div class="bars" id="activity-bars">
-        ${rows.map((r,i)=>`
+        ${rows.map((r,i)=>
           <div class="bar-row">
             <div class="bar-head">
               <span class="bar-name">${r.name}</span>
@@ -228,6 +256,227 @@ function renderProgressPanel(list){
       el.style.setProperty('--bar-color', color);
       el.style.width = pct + '%';
     });
+  });
+}
+
+/* =======================================================
+   Charts Section - New Charts for Dashboard
+   ======================================================= */
+let chartInstances = {};
+
+function renderCharts(projects) {
+  // Destroy existing charts to prevent memory leaks
+  Object.values(chartInstances).forEach(chart => {
+    if (chart) chart.destroy();
+  });
+  chartInstances = {};
+
+  // Chart 1: Bar chart - Total project volume by activity
+  renderVolumeByActivityChart(projects);
+  
+  // Chart 2: Doughnut chart - Project count by status
+  renderProjectsByStatusChart(projects);
+  
+  // Chart 3: Line chart - Monthly project completions
+  renderMonthlyCompletionsChart(projects);
+}
+
+function renderVolumeByActivityChart(projects) {
+  const ctx = document.getElementById('chart-volume-by-activity');
+  if (!ctx) return;
+
+  // Group by activity and sum estimatePeriodic
+  const activityTotals = {};
+  projects.forEach(project => {
+    const activity = project.activity || 'לא ידוע';
+    const estimate = parseFloat(String(project.estimatePeriodic || '').replace(/[, ]/g, '')) || 0;
+    activityTotals[activity] = (activityTotals[activity] || 0) + estimate;
+  });
+
+  const activities = Object.keys(activityTotals);
+  const volumes = activities.map(activity => activityTotals[activity]);
+
+  chartInstances.volumeByActivity = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: activities,
+      datasets: [{
+        label: 'היקף פרויקטים (₪)',
+        data: volumes,
+        backgroundColor: [
+          '#b8ff7a', '#6ee7ff', '#a78bfa', '#60a5fa', 
+          '#fbbf24', '#34d399', '#f472b6', '#94a3b8'
+        ],
+        borderColor: '#0f172a',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + fmtCurrency(context.parsed.y);
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return fmtCurrency(value);
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderProjectsByStatusChart(projects) {
+  const ctx = document.getElementById('chart-projects-by-status');
+  if (!ctx) return;
+
+  // Count projects by status
+  const statusCounts = {};
+  projects.forEach(project => {
+    const status = project.projStatus || 'לא ידוע';
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  });
+
+  const statuses = Object.keys(statusCounts);
+  const counts = statuses.map(status => statusCounts[status]);
+
+  // Color mapping based on existing KPI colors
+  const statusColors = {
+    'הסתיים': '#d6f95c',
+    'בתהליך': '#3fe1f6', 
+    'לא התחיל': '#22c55e',
+    'מבוטל': '#94a3b8',
+    'מוקפא': '#60a5fa',
+    'לא ידוע': '#6b7280'
+  };
+
+  const colors = statuses.map(status => statusColors[status] || '#6b7280');
+
+  chartInstances.projectsByStatus = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: statuses,
+      datasets: [{
+        data: counts,
+        backgroundColor: colors,
+        borderColor: '#ffffff',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.parsed / total) * 100).toFixed(1);
+              return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderMonthlyCompletionsChart(projects) {
+  const ctx = document.getElementById('chart-monthly-completions');
+  if (!ctx) return;
+
+  // Group completed projects by month
+  const monthlyCompletions = {};
+  const completedStatuses = ['הסתיים', 'מבוטל', 'מוקפא'];
+  
+  projects.forEach(project => {
+    if (completedStatuses.includes(project.projStatus) && project.actualEnd) {
+      try {
+        const date = new Date(project.actualEnd);
+        const monthKey = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+        monthlyCompletions[monthKey] = (monthlyCompletions[monthKey] || 0) + 1;
+      } catch (e) {
+        // Skip invalid dates
+      }
+    }
+  });
+
+  // Sort months chronologically
+  const sortedMonths = Object.keys(monthlyCompletions).sort();
+  const completions = sortedMonths.map(month => monthlyCompletions[month]);
+  
+  // Format month labels for display
+  const monthLabels = sortedMonths.map(month => {
+    const [year, month] = month.split('-');
+    const monthNames = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+                       'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+    return monthNames[parseInt(month) - 1] + ' ' + year;
+  });
+
+  chartInstances.monthlyCompletions = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: monthLabels,
+      datasets: [{
+        label: 'פרויקטים שהושלמו',
+        data: completions,
+        borderColor: '#3fe1f6',
+        backgroundColor: 'rgba(63, 225, 246, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#3fe1f6',
+        pointBorderColor: '#0f172a',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'הושלמו: ' + context.parsed.y + ' פרויקטים';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    }
   });
 }
 
@@ -697,6 +946,7 @@ function initDashboard(){
     });
     renderKpis(list);
     renderProgressPanel(list); // <<< חדש: עדכון הכרטיס
+    renderCharts(list); // <<< חדש: עדכון הגרפים
   }
 
   Object.values(filters).forEach(sel=> sel && sel.addEventListener('change', applyFilters));
